@@ -1,18 +1,28 @@
 import sqlite3
+import user_db
 
 def construct_db(admin_id, admin_password):
+	"""
+	Initializes and creates a database
+	"""
 	connection = sqlite3.connect('users.db')
-	c = connection.cursor()
+	cursor = connection.cursor()
 	try:
-		c.execute("CREATE TABLE users (user_id UNIQUE, password, access_level)")
+		cursor.execute("CREATE TABLE users (user_id UNIQUE, hashed_password, salt, access_level)")
 	except:
 		print("\nDATABASE already exists. If you want to re-initialize the database, please delete users.db and run init_db.py\n")
 		return
-	c.execute("INSERT INTO users VALUES (?,?,?)", (admin_id, admin_password, 'administrator'))
-	c.execute("SELECT * FROM users")
-	print('\nAdmin setup is complete: ')
-	print(str(c.fetchall()) + '\n')
+
+	salt = user_db.salt_generator()
+	hashed_password = user_db.hash_function(admin_password + salt)
+
+	cursor.execute("INSERT INTO users VALUES (?,?,?,?)", (admin_id, hashed_password, salt, 'administrator'))
+	cursor.execute("SELECT * FROM users")
+	print('--------------------------------------------')
+	print('\nAdministrator account setup is complete. ')
 	print('You are ready to run user_db.py\n')
+	print('--------------------------------------------')
+	print(cursor.fetchall())
 	connection.commit()
 	connection.close()
 

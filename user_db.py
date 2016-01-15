@@ -4,7 +4,7 @@ December 10, 2015
 Written by Tony Lee
 
 '''
-import os, sys, sqlite3
+import os, sys, sqlite3, string, random, hashlib
 
 DATABASE = 'users.db'
 connection = None
@@ -17,6 +17,8 @@ Database methods
 3) add_user(user_id, password)
 4) check_user(user_id)
 5) authenticate_credentials(user_id, password)
+6) salt_generator()
+7) hash_function(password_salt)
 '''
 def get_db():
     try:
@@ -53,8 +55,9 @@ def get_user_db(user_id):
             print("\nUser doesn't exist in the database.\n")
             return False
         print('\nUser_id: ' + str(data[0][0]))
-        print('Password: ' + str(data[0][1]))
-        print('Access_level: ' + str(data[0][2]) + '\n')
+        print('Hashed_password: ' + str(data[0][1]))
+        print('Salt: ' + str(data[0][1]))
+        print('Access_level: ' + str(data[0][3]) + '\n')
         return True
     except:
         print('\nUnexpected error: contact your administrator.\n')
@@ -65,18 +68,28 @@ def authenticate_credentials_db(user_id, password):
     try:
         cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
         data = cursor.fetchall()
-        if data[0][0] == user_id and data[0][1] == password:
-            print("\nCredential authentication successful.\n")
-            if data[0][2] == 'administrator':
-                global admin_access
-                admin_access = True
-            return True
+        if data[0][0] == user_id:
+            if hash_function(password + data[0][2]) == data[0][1]:
+                print("\nCredential authentication successful.\n")
+                if data[0][3] == 'administrator':
+                    global admin_access
+                    admin_access = True
+                return True
+            else:
+                print("\nIncorrect password.\n")
+                return False
         else:
-            print("\nIncorrect user_id or password.\n")
+            print("\nIncorrect user_id.\n")
             return False
     except:
         print('\nCredential authentication failed.\n')
         return False
+
+def salt_generator():
+    return ''.join(random.choice(string.ascii_uppercase + string.digits) for i in range(2))
+
+def hash_function(password_salt):
+    return str(hashlib.md5(password_salt.encode()).hexdigest)
 
 '''
 System methods
