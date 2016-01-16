@@ -40,8 +40,10 @@ def get_all_users_db():
         return
 
 def add_user_db(user_id, password):
+    salt = salt_generator()
+    hashed_password = hash_function(password + salt)
     try:
-        get_db().cursor().execute("INSERT INTO users VALUES (?,?,?)", (user_id, password, 'user'))
+        get_db().cursor().execute("INSERT INTO users VALUES (?,?,?,?)", (user_id, hashed_password, salt, 'user'))
         get_db().commit()
     except:
         print('\nFailed: User already exists in the database.\n')
