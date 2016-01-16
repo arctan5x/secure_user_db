@@ -89,7 +89,10 @@ def salt_generator():
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for i in range(2))
 
 def hash_function(password_salt):
-    return str(hashlib.md5(password_salt.encode()).hexdigest)
+    hashed_val = 0
+    for c in password_salt:
+        hashed_val += 5 * 100003 ^ ord(c) * 193092
+    return hashed_val
 
 '''
 System methods
