@@ -22,7 +22,6 @@ def construct_db(admin_id, admin_password):
 	print('\nAdministrator account setup is complete. ')
 	print('You are ready to run user_db.py\n')
 	print('--------------------------------------------')
-	print(cursor.fetchall())
 	connection.commit()
 	connection.close()
 

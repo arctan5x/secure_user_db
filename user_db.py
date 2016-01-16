@@ -86,13 +86,13 @@ def authenticate_credentials_db(user_id, password):
         return False
 
 def salt_generator():
-    return ''.join(random.choice(string.ascii_uppercase + string.digits) for i in range(2))
+    return ''.join(random.choice(string.ascii_uppercase + string.digits) for i in range(512))
 
 def hash_function(password_salt):
     hashed_val = 0
     for c in password_salt:
-        hashed_val += 5 * 100003 ^ ord(c) * 193092
-    return hashed_val
+        hashed_val += 534 ^ ord(c) * 193092
+    return hashed_val 
 
 '''
 System methods
